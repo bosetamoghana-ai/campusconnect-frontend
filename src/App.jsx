@@ -30,7 +30,7 @@ import {
 // CONFIGURATION
 // ============================================================
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'http://campusconnect-backend-mr1u.onrender.com/api';
 
 // ============================================================
 // REUSABLE UI COMPONENTS
@@ -234,12 +234,12 @@ export default function CampusConnectApp() {
     // --- NEW: FETCH ALL REAL DATA FROM MONGODB ---
     try {
       // Fetch Real Users
-      const usersRes = await fetch('http://localhost:5000/api/users');
+      const usersRes = await fetch('http://campusconnect-backend-mr1u.onrender.com/api/users');
       const realUsers = await usersRes.json();
       setUsersList(realUsers);
 
       // Fetch Real Marketplace Items
-      const marketRes = await fetch('http://localhost:5000/api/marketplace');
+      const marketRes = await fetch('http://campusconnect-backend-mr1u.onrender.com/api/marketplace');
       const realMarketItems = await marketRes.json();
       setMarketItems(realMarketItems);
     } catch (error) {
@@ -1462,7 +1462,7 @@ const MarketplaceView = ({
     
     // 1. Send the new item to the Node.js Backend
     try {
-      const res = await fetch('http://localhost:5000/api/marketplace', {
+      const res = await fetch('http://campusconnect-backend-mr1u.onrender.com/api/marketplace', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
