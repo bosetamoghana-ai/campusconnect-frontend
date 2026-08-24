@@ -24,13 +24,20 @@ import {
   Sun,
   Moon,
   Shield,
+  Eye,
+  EyeOff,
+  Send,
+  Check,
+  UserPlus,
+  UserX,
+  UserCheck,
 } from 'lucide-react';
 
 // ============================================================
 // CONFIGURATION
 // ============================================================
 
-const API_BASE_URL = 'http://campusconnect-backend-mr1u.onrender.com/api';
+const API_BASE_URL = 'http://localhost:5000/api';
 
 // ============================================================
 // REUSABLE UI COMPONENTS
@@ -117,6 +124,264 @@ const Input = ({ label, error, ...props }) => (
 );
 
 // ============================================================
+// GLOBAL ANIMATIONS (self-contained, no external CSS needed)
+// ============================================================
+
+const GlobalAnimationStyles = () => (
+  <style>{`
+    @keyframes ccFadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes ccBounceIn {
+      0%   { opacity: 0; transform: scale(0.55) rotate(-3deg); }
+      55%  { opacity: 1; transform: scale(1.05) rotate(1deg); }
+      75%  { transform: scale(0.97) rotate(-0.5deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+
+    @keyframes ccShake {
+      10%, 90% { transform: translateX(-2px); }
+      20%, 80% { transform: translateX(4px); }
+      30%, 50%, 70% { transform: translateX(-8px); }
+      40%, 60% { transform: translateX(8px); }
+    }
+
+    @keyframes ccFloatBlob {
+      0%   { transform: translate(0, 0) scale(1); }
+      33%  { transform: translate(24px, -30px) scale(1.08); }
+      66%  { transform: translate(-18px, 20px) scale(0.94); }
+      100% { transform: translate(0, 0) scale(1); }
+    }
+
+    @keyframes ccGradientShift {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @keyframes ccDropFall {
+      0%   { transform: translateY(-40px) scale(0.6); opacity: 0; }
+      15%  { opacity: 1; }
+      75%  { transform: translateY(60px) scale(1); opacity: 1; }
+      100% { transform: translateY(66px) scale(0.3); opacity: 0; }
+    }
+
+    @keyframes ccSplashRing {
+      0%   { transform: scale(0.2); opacity: 0.9; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+
+    @keyframes ccWiggle {
+      0%, 100% { transform: rotate(0deg); }
+      25%      { transform: rotate(-4deg); }
+      75%      { transform: rotate(4deg); }
+    }
+
+    @keyframes ccPopIn {
+      0%   { opacity: 0; transform: scale(0.6); }
+      70%  { opacity: 1; transform: scale(1.05); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .cc-pop-in {
+      animation: ccPopIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+
+    .cc-stagger-grid > * {
+      opacity: 0;
+      animation: ccFadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .cc-stagger-grid > *:nth-child(1) { animation-delay: 0.04s; }
+    .cc-stagger-grid > *:nth-child(2) { animation-delay: 0.1s; }
+    .cc-stagger-grid > *:nth-child(3) { animation-delay: 0.16s; }
+    .cc-stagger-grid > *:nth-child(4) { animation-delay: 0.22s; }
+    .cc-stagger-grid > *:nth-child(5) { animation-delay: 0.28s; }
+    .cc-stagger-grid > *:nth-child(6) { animation-delay: 0.34s; }
+    .cc-stagger-grid > *:nth-child(7) { animation-delay: 0.4s; }
+    .cc-stagger-grid > *:nth-child(8) { animation-delay: 0.46s; }
+    .cc-stagger-grid > *:nth-child(n+9) { animation-delay: 0.5s; }
+
+    .cc-hover-lift {
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .cc-hover-lift:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 14px 28px rgba(0,0,0,0.14);
+    }
+
+    .cc-fade-up {
+      animation: ccFadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    .cc-bounce-in {
+      animation: ccBounceIn 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+
+    .cc-shake {
+      animation: ccShake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    }
+
+    .cc-glow-btn:hover {
+      animation: ccGlowPulse 1.4s ease-out infinite;
+    }
+
+    @keyframes ccGlowPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(22,131,111,0.45); }
+      50%      { box-shadow: 0 0 0 10px rgba(22,131,111,0); }
+    }
+
+    .dark .cc-glow-btn:hover {
+      animation-name: ccGlowPulseDark;
+    }
+
+    @keyframes ccGlowPulseDark {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(85,184,159,0.5); }
+      50%      { box-shadow: 0 0 0 10px rgba(85,184,159,0); }
+    }
+
+    .cc-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(50px);
+      opacity: 0.5;
+      pointer-events: none;
+      animation: ccFloatBlob 9s ease-in-out infinite;
+      z-index: 0;
+    }
+
+    .cc-gradient-text-animated {
+      background: linear-gradient(
+        90deg,
+        var(--accent, #16836f),
+        var(--brand-coral, #ef756c),
+        var(--warning, #c78a3b),
+        var(--accent, #16836f)
+      );
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: ccGradientShift 6s ease infinite;
+    }
+
+    .cc-water-scene {
+      position: relative;
+      width: 100%;
+      height: 90px;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .cc-drop {
+      position: absolute;
+      top: 0;
+      width: 10px;
+      height: 10px;
+      border-radius: 50% 50% 50% 0;
+      background: linear-gradient(
+        135deg,
+        var(--accent, #16836f),
+        var(--accent-hover, #0f6d5c)
+      );
+      animation: ccDropFall 1.8s ease-in infinite;
+    }
+
+    .cc-splash-ring {
+      position: absolute;
+      bottom: 6px;
+      width: 26px;
+      height: 26px;
+      margin-left: -13px;
+      border: 2px solid var(--accent, #16836f);
+      border-radius: 50%;
+      animation: ccSplashRing 1.8s ease-out infinite;
+    }
+
+    .cc-wiggle {
+      animation: ccWiggle 2.4s ease-in-out infinite;
+      transform-origin: bottom center;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .cc-fade-up, .cc-bounce-in, .cc-shake, .cc-blob,
+      .cc-gradient-text-animated, .cc-drop, .cc-splash-ring,
+      .cc-wiggle, .cc-glow-btn:hover, .cc-pop-in,
+      .cc-stagger-grid > * {
+        animation: none !important;
+        opacity: 1 !important;
+      }
+    }
+  `}</style>
+);
+
+// ============================================================
+// PASSWORD INPUT (with show/hide eye toggle)
+// ============================================================
+
+const PasswordInput = ({ label, error, ...props }) => {
+  const [visible, setVisible] = useState(false);
+
+  return (
+    <div className="campus-input-wrapper">
+      {label && (
+        <label className="campus-input-label">
+          {label}
+        </label>
+      )}
+
+      <div style={{ position: 'relative' }}>
+        <input
+          type={visible ? 'text' : 'password'}
+          className={`campus-input ${
+            error ? 'campus-input-error' : ''
+          }`}
+          style={{ paddingRight: '2.5rem', width: '100%' }}
+          {...props}
+        />
+
+        <button
+          type="button"
+          onClick={() => setVisible((v) => !v)}
+          tabIndex={-1}
+          style={{
+            position: 'absolute',
+            right: '0.6rem',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: '2px',
+            display: 'flex',
+            alignItems: 'center',
+            opacity: 0.6,
+          }}
+          aria-label={
+            visible ? 'Hide password' : 'Show password'
+          }
+        >
+          {visible ? (
+            <EyeOff className="w-4 h-4" />
+          ) : (
+            <Eye className="w-4 h-4" />
+          )}
+        </button>
+      </div>
+
+      {error && (
+        <p className="campus-input-error-text">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+};
+
+// ============================================================
 // BADGE
 // ============================================================
 
@@ -194,9 +459,66 @@ export default function CampusConnectApp() {
   // Demo / local UI data
   // ----------------------------------------------------------
 
- // Change these from dummy data to empty arrays
-  const [usersList, setUsersList] = useState([]);
-  const [marketItems, setMarketItems] = useState([]);
+  const [usersList, setUsersList] = useState([
+    {
+      id: '1',
+      name: 'Tamoghna',
+      email: 'tamoghna@college.edu',
+      branch: 'CSE',
+      year: '2nd',
+      rollNo: '24BCE102',
+      status: 'verified',
+      role: 'student',
+      avatar: '',
+    },
+    {
+      id: '2',
+      name: 'Priya Saha',
+      email: 'priya@college.edu',
+      branch: 'ECE',
+      year: '3rd',
+      rollNo: '23BEC045',
+      status: 'verified',
+      role: 'student',
+      avatar: '',
+    },
+    {
+      id: '3',
+      name: 'Amit Kumar',
+      email: 'amit@college.edu',
+      branch: 'MECH',
+      year: '1st',
+      rollNo: '25BME089',
+      status: 'pending',
+      role: 'student',
+      avatar: '',
+    },
+  ]);
+
+  const [marketItems, setMarketItems] = useState([
+    {
+      id: 'm1',
+      title: 'Engineering Mathematics Vol 1',
+      price: 350,
+      condition: 'Good',
+      category: 'Books',
+      sellerName: 'Tamoghna',
+      description:
+        'Used for one semester. Good condition.',
+      createdAt: Date.now(),
+    },
+    {
+      id: 'm2',
+      title: 'Scientific Calculator fx-991EX',
+      price: 800,
+      condition: 'Like New',
+      category: 'Electronics',
+      sellerName: 'Priya Saha',
+      description: 'Perfect working condition.',
+      createdAt: Date.now() - 10000,
+    },
+  ]);
+
   // ----------------------------------------------------------
   // Dark mode
   // ----------------------------------------------------------
@@ -224,28 +546,8 @@ export default function CampusConnectApp() {
   // Authentication
   // ----------------------------------------------------------
 
- const handleLogin = async (userData) => {
-    if (userData === 'admin') {
-      setProfile({ id: 'admin1', name: 'Admin Portal', role: 'admin', status: 'verified', branch: 'Admin', year: 'Staff', rollNo: 'ADMIN001' });
-    } else {
-      setProfile(userData); 
-    }
-    
-    // --- NEW: FETCH ALL REAL DATA FROM MONGODB ---
-    try {
-      // Fetch Real Users
-      const usersRes = await fetch('http://campusconnect-backend-mr1u.onrender.com/api/users');
-      const realUsers = await usersRes.json();
-      setUsersList(realUsers);
-
-      // Fetch Real Marketplace Items
-      const marketRes = await fetch('http://campusconnect-backend-mr1u.onrender.com/api/marketplace');
-      const realMarketItems = await marketRes.json();
-      setMarketItems(realMarketItems);
-    } catch (error) {
-      console.error("Failed to fetch database data:", error);
-    }
-
+  const handleLogin = (userData) => {
+    setProfile(userData);
     setCurrentView('dashboard');
   };
 
@@ -253,6 +555,140 @@ export default function CampusConnectApp() {
     setProfile(null);
     setCurrentView('landing');
   };
+
+  // ----------------------------------------------------------
+  // Notifications: incoming friend requests + unread messages
+  // (uses only existing backend routes — no backend changes)
+  // ----------------------------------------------------------
+
+  const [incomingRequests, setIncomingRequests] = useState(
+    []
+  );
+  const [unreadByFriend, setUnreadByFriend] = useState({});
+
+  const currentUserId = profile?._id || profile?.id;
+
+  const getLastReadKey = (friendId) =>
+    `cc_lastRead_${currentUserId}_${friendId}`;
+
+  const markFriendRead = (friendId) => {
+    if (!currentUserId || !friendId) return;
+
+    localStorage.setItem(
+      getLastReadKey(friendId),
+      new Date().toISOString()
+    );
+
+    setUnreadByFriend((previous) => {
+      if (!previous[friendId]) return previous;
+
+      const next = { ...previous };
+      next[friendId] = 0;
+      return next;
+    });
+  };
+
+  const pollNotifications = async () => {
+    if (!currentUserId) return;
+
+    try {
+      const reqRes = await fetch(
+        `${API_BASE_URL}/requests/incoming/${currentUserId}`
+      );
+
+      const reqData = await reqRes.json();
+
+      setIncomingRequests(
+        Array.isArray(reqData) ? reqData : []
+      );
+    } catch (err) {
+      // silent fail on background poll
+    }
+
+    try {
+      const friendRes = await fetch(
+        `${API_BASE_URL}/friends/${currentUserId}`
+      );
+
+      const friends = await friendRes.json();
+
+      if (!Array.isArray(friends)) return;
+
+      const counts = await Promise.all(
+        friends.map(async (friend) => {
+          try {
+            const msgRes = await fetch(
+              `${API_BASE_URL}/messages/${currentUserId}/${friend._id}`
+            );
+
+            const msgs = await msgRes.json();
+
+            if (!Array.isArray(msgs)) {
+              return [friend._id, 0];
+            }
+
+            const lastReadRaw = localStorage.getItem(
+              getLastReadKey(friend._id)
+            );
+
+            const lastRead = lastReadRaw
+              ? new Date(lastReadRaw)
+              : new Date(0);
+
+            const unread = msgs.filter((m) => {
+              const senderId =
+                m.from?._id || m.from;
+
+              return (
+                senderId !== currentUserId &&
+                new Date(m.createdAt) > lastRead
+              );
+            }).length;
+
+            return [friend._id, unread];
+          } catch (err) {
+            return [friend._id, 0];
+          }
+        })
+      );
+
+      setUnreadByFriend(Object.fromEntries(counts));
+    } catch (err) {
+      // silent fail on background poll
+    }
+  };
+
+  useEffect(() => {
+    if (!currentUserId) return;
+
+    pollNotifications();
+
+    const interval = setInterval(pollNotifications, 8000);
+
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUserId]);
+
+  const handleRespondToRequest = async (
+    requestId,
+    action
+  ) => {
+    try {
+      await fetch(`${API_BASE_URL}/requests/respond`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ requestId, action }),
+      });
+
+      pollNotifications();
+    } catch (err) {
+      // silent fail
+    }
+  };
+
+  const totalUnreadMessages = Object.values(
+    unreadByFriend
+  ).reduce((sum, n) => sum + n, 0);
 
   // ----------------------------------------------------------
   // Router
@@ -282,6 +718,16 @@ export default function CampusConnectApp() {
         <AuthView
           onComplete={handleLogin}
           onBack={() => setCurrentView('landing')}
+          onAdminLogin={() => setCurrentView('admin-auth')}
+        />
+      );
+    }
+
+    if (currentView === 'admin-auth') {
+      return (
+        <AdminAuthView
+          onComplete={handleLogin}
+          onBack={() => setCurrentView('auth')}
         />
       );
     }
@@ -291,6 +737,7 @@ export default function CampusConnectApp() {
         <AuthView
           onComplete={handleLogin}
           onBack={() => setCurrentView('landing')}
+          onAdminLogin={() => setCurrentView('admin-auth')}
         />
       );
     }
@@ -314,6 +761,9 @@ export default function CampusConnectApp() {
         onLogout={handleLogout}
         darkMode={darkMode}
         setDarkMode={setDarkMode}
+        incomingRequests={incomingRequests}
+        onRespondToRequest={handleRespondToRequest}
+        totalUnreadMessages={totalUnreadMessages}
       >
 
         {currentView === 'dashboard' && (
@@ -325,7 +775,7 @@ export default function CampusConnectApp() {
         )}
 
         {currentView === 'directory' && (
-          <DirectoryView usersList={usersList} />
+          <DirectoryView profile={profile} />
         )}
 
         {currentView === 'marketplace' && (
@@ -348,9 +798,14 @@ export default function CampusConnectApp() {
           <ProfileView profile={profile} />
         )}
 
-        {['notes', 'events', 'chat'].includes(
-          currentView
-        ) && (
+        {currentView === 'chat' && (
+          <ChatView
+            profile={profile}
+            markFriendRead={markFriendRead}
+          />
+        )}
+
+        {['notes', 'events'].includes(currentView) && (
           <ComingSoonView currentView={currentView} />
         )}
       </AppLayout>
@@ -359,6 +814,7 @@ export default function CampusConnectApp() {
 
   return (
     <div className="campus-root">
+      <GlobalAnimationStyles />
       {renderView()}
     </div>
   );
@@ -418,32 +874,88 @@ const LandingView = ({
         </div>
       </nav>
 
-      <div className="campus-container campus-hero">
-        <div className="campus-hero-content">
-          <div className="campus-exclusive-badge">
+      <div
+        className="campus-container campus-hero"
+        style={{ position: 'relative', overflow: 'hidden' }}
+      >
+        <div
+          className="cc-blob"
+          style={{
+            width: '340px',
+            height: '340px',
+            top: '-80px',
+            left: '-60px',
+            background:
+              'radial-gradient(circle, var(--accent, #16836f), transparent 70%)',
+          }}
+        />
+
+        <div
+          className="cc-blob"
+          style={{
+            width: '260px',
+            height: '260px',
+            top: '40px',
+            right: '-40px',
+            background:
+              'radial-gradient(circle, var(--brand-coral, #ef756c), transparent 70%)',
+            animationDelay: '2s',
+          }}
+        />
+
+        <div
+          className="cc-blob"
+          style={{
+            width: '220px',
+            height: '220px',
+            bottom: '-60px',
+            left: '30%',
+            background:
+              'radial-gradient(circle, var(--warning, #c78a3b), transparent 70%)',
+            animationDelay: '4s',
+          }}
+        />
+
+        <div
+          className="campus-hero-content"
+          style={{ position: 'relative', zIndex: 1 }}
+        >
+          <div
+            className="campus-exclusive-badge cc-fade-up"
+            style={{ animationDelay: '0.05s' }}
+          >
             <span className="campus-status-dot" />
             Exclusive to Your University
           </div>
 
-          <h1 className="campus-hero-title">
+          <h1
+            className="campus-hero-title cc-fade-up"
+            style={{ animationDelay: '0.15s' }}
+          >
             The Ultimate
             <br />
-            <span className="campus-gradient-text">
+            <span className="campus-gradient-text cc-gradient-text-animated">
               Student Network
             </span>
           </h1>
 
-          <p className="campus-hero-description">
+          <p
+            className="campus-hero-description cc-fade-up"
+            style={{ animationDelay: '0.28s' }}
+          >
             Connect with peers, buy & sell on the
             marketplace, access study notes, and discover
             campus events all in one beautifully designed
             platform.
           </p>
 
-          <div className="campus-hero-buttons">
+          <div
+            className="campus-hero-buttons cc-fade-up"
+            style={{ animationDelay: '0.4s' }}
+          >
             <Button
               size="lg"
-              className="w-full sm:w-auto gap-2"
+              className="w-full sm:w-auto gap-2 cc-glow-btn"
               onClick={() => onNavigate('auth')}
             >
               Get Started
@@ -461,13 +973,20 @@ const LandingView = ({
           </div>
         </div>
 
-        <div className="campus-hero-preview">
+        <div
+          className="campus-hero-preview cc-fade-up"
+          style={{
+            position: 'relative',
+            zIndex: 1,
+            animationDelay: '0.5s',
+          }}
+        >
           <div className="campus-preview-glow" />
 
           <Card className="campus-preview-card">
             <div className="campus-preview-user">
               <Avatar
-                alt="Tamoghana"
+                alt="Tamoghna"
                 size="md"
                 verified
               />
@@ -502,7 +1021,7 @@ const LandingView = ({
 // AUTHENTICATION
 // ============================================================
 
-const AuthView = ({ onComplete, onBack }) => {
+const AuthView = ({ onComplete, onBack, onAdminLogin }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -514,6 +1033,7 @@ const AuthView = ({ onComplete, onBack }) => {
     rollNo: '',
     branch: 'CSE',
     password: '',
+    confirmPassword: '',
     otp: '',
   });
 
@@ -535,6 +1055,7 @@ const AuthView = ({ onComplete, onBack }) => {
       rollNo: '',
       branch: 'CSE',
       password: '',
+      confirmPassword: '',
       otp: '',
     });
   };
@@ -574,6 +1095,12 @@ const AuthView = ({ onComplete, onBack }) => {
       }
 
       if (!otpSent) {
+        if (formData.password !== formData.confirmPassword) {
+          throw new Error(
+            'Password and Confirm Password do not match.'
+          );
+        }
+
         const res = await fetch(
           `${API_BASE_URL}/auth/send-otp`,
           {
@@ -635,7 +1162,10 @@ const AuthView = ({ onComplete, onBack }) => {
   };
 
   return (
-    <div className="campus-auth-page">
+    <div
+      className="campus-auth-page"
+      style={{ position: 'relative', overflow: 'hidden' }}
+    >
       <button
         onClick={onBack}
         className="campus-back-button"
@@ -643,7 +1173,12 @@ const AuthView = ({ onComplete, onBack }) => {
         ← Back
       </button>
 
-      <Card className="campus-auth-card">
+      <Card
+        key={error || 'card-default'}
+        className={`campus-auth-card cc-bounce-in ${
+          error ? 'cc-shake' : ''
+        }`}
+      >
         <div className="text-center mb-8">
           <div className="campus-auth-logo">
             <img
@@ -736,16 +1271,27 @@ const AuthView = ({ onComplete, onBack }) => {
             disabled={otpSent}
           />
 
-          <Input
+          <PasswordInput
             label="Password"
             name="password"
-            type="password"
             placeholder="••••••••"
             value={formData.password}
             onChange={handleChange}
             required
             disabled={otpSent}
           />
+
+          {!isLogin && (
+            <PasswordInput
+              label="Confirm Password"
+              name="confirmPassword"
+              placeholder="••••••••"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              required
+              disabled={otpSent}
+            />
+          )}
 
           {otpSent && (
             <div className="campus-otp-box">
@@ -783,16 +1329,19 @@ const AuthView = ({ onComplete, onBack }) => {
           </Button>
         </form>
 
-        <div className="mt-4">
-          <Button
-            variant="ghost"
-            className="w-full text-xs campus-muted-button"
-            onClick={() => onComplete('admin')}
-            type="button"
-          >
-            [Developer Fast-Track: Login as Admin]
-          </Button>
-        </div>
+        {isLogin && (
+          <div className="mt-4">
+            <Button
+              variant="ghost"
+              className="w-full text-xs campus-muted-button gap-2"
+              onClick={onAdminLogin}
+              type="button"
+            >
+              <Shield className="w-3.5 h-3.5" />
+              Login as Admin
+            </Button>
+          </div>
+        )}
 
         <div className="mt-6 text-center text-sm">
           <span className="campus-secondary-text">
@@ -811,6 +1360,199 @@ const AuthView = ({ onComplete, onBack }) => {
             {isLogin ? 'Register now' : 'Sign in'}
           </button>
         </div>
+      </Card>
+    </div>
+  );
+};
+
+// ============================================================
+// ADMIN LOGIN (whitelist + OTP + password)
+// ============================================================
+
+const AdminAuthView = ({ onComplete, onBack }) => {
+  const [step, setStep] = useState('email'); // 'email' -> 'verify'
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const [email, setEmail] = useState('');
+  const [otp, setOtp] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleSendOtp = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      const res = await fetch(
+        `${API_BASE_URL}/admin/send-otp`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || 'Unable to send OTP.');
+      }
+
+      setStep('verify');
+    } catch (err) {
+      setError(err?.message || 'Something went wrong.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerify = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      const res = await fetch(
+        `${API_BASE_URL}/admin/verify`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, otp, password }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(
+          data.message || 'Admin verification failed.'
+        );
+      }
+
+      onComplete(data.user);
+    } catch (err) {
+      setError(err?.message || 'Something went wrong.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div
+      className="campus-auth-page"
+      style={{ position: 'relative', overflow: 'hidden' }}
+    >
+      <button
+        onClick={onBack}
+        className="campus-back-button"
+      >
+        ← Back
+      </button>
+
+      <Card
+        key={error || 'admin-card-default'}
+        className={`campus-auth-card cc-bounce-in ${
+          error ? 'cc-shake' : ''
+        }`}
+      >
+        <div className="text-center mb-8">
+          <div
+            className="campus-auth-logo"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Shield className="w-10 h-10 campus-accent-icon" />
+          </div>
+
+          <h2 className="campus-auth-title">
+            Admin Access
+          </h2>
+
+          <p className="campus-secondary-text mt-2">
+            {step === 'email'
+              ? 'Restricted to authorized administrators only.'
+              : 'Enter the OTP sent to your email and your account password.'}
+          </p>
+        </div>
+
+        {error && (
+          <div className="campus-error-box">{error}</div>
+        )}
+
+        {step === 'email' && (
+          <form
+            onSubmit={handleSendOtp}
+            className="space-y-4"
+          >
+            <Input
+              label="Admin Email"
+              type="email"
+              placeholder="name.branch29@heritageit.edu.in"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+
+            <Button
+              type="submit"
+              className="w-full mt-2"
+              disabled={loading}
+            >
+              {loading ? 'Sending OTP...' : 'Send OTP'}
+            </Button>
+          </form>
+        )}
+
+        {step === 'verify' && (
+          <form
+            onSubmit={handleVerify}
+            className="space-y-4"
+          >
+            <Input
+              label="6-Digit OTP"
+              type="text"
+              inputMode="numeric"
+              maxLength={6}
+              placeholder="123456"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              required
+            />
+
+            <PasswordInput
+              label="Account Password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+
+            <Button
+              type="submit"
+              className="w-full mt-2"
+              disabled={loading}
+            >
+              {loading ? 'Verifying...' : 'Verify & Enter'}
+            </Button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setStep('email');
+                setOtp('');
+                setPassword('');
+                setError('');
+              }}
+              className="campus-link text-sm w-full text-center"
+            >
+              Use a different email
+            </button>
+          </form>
+        )}
       </Card>
     </div>
   );
@@ -858,9 +1600,13 @@ const AppLayout = ({
   onLogout,
   darkMode,
   setDarkMode,
+  incomingRequests = [],
+  onRespondToRequest,
+  totalUnreadMessages = 0,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] =
     useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
 
   const navItems = [
     {
@@ -892,6 +1638,7 @@ const AppLayout = ({
       id: 'chat',
       label: 'Messages',
       icon: MessageSquare,
+      badge: totalUnreadMessages,
     },
   ];
 
@@ -920,9 +1667,43 @@ const AppLayout = ({
                 ? 'campus-nav-link-active'
                 : ''
             }`}
+            style={{
+              position: 'relative',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
           >
-            <Icon className="w-5 h-5" />
-            {item.label}
+            <span
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.6rem',
+              }}
+            >
+              <Icon className="w-5 h-5" />
+              {item.label}
+            </span>
+
+            {!!item.badge && (
+              <span
+                style={{
+                  background: '#ef4444',
+                  color: '#fff',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  borderRadius: '999px',
+                  minWidth: '18px',
+                  height: '18px',
+                  padding: '0 5px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                {item.badge > 9 ? '9+' : item.badge}
+              </span>
+            )}
           </button>
         );
       })}
@@ -1093,11 +1874,151 @@ const AppLayout = ({
               />
             </div>
 
-            <button className="campus-icon-button campus-notification-button">
-              <Bell className="w-5 h-5" />
+            <div style={{ position: 'relative' }}>
+              <button
+                onClick={() => setNotifOpen((v) => !v)}
+                className="campus-icon-button campus-notification-button"
+              >
+                <Bell className="w-5 h-5" />
 
-              <span className="campus-notification-dot" />
-            </button>
+                {incomingRequests.length > 0 && (
+                  <span
+                    className="cc-pop-in"
+                    style={{
+                      position: 'absolute',
+                      top: '2px',
+                      right: '2px',
+                      background: '#ef4444',
+                      color: '#fff',
+                      fontSize: '10px',
+                      fontWeight: 700,
+                      borderRadius: '999px',
+                      minWidth: '16px',
+                      height: '16px',
+                      padding: '0 4px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      border: '2px solid var(--surface, #fff)',
+                    }}
+                  >
+                    {incomingRequests.length > 9
+                      ? '9+'
+                      : incomingRequests.length}
+                  </span>
+                )}
+              </button>
+
+              {notifOpen && (
+                <>
+                  <div
+                    onClick={() => setNotifOpen(false)}
+                    style={{
+                      position: 'fixed',
+                      inset: 0,
+                      zIndex: 40,
+                    }}
+                  />
+
+                  <div
+                    className="campus-card cc-pop-in"
+                    style={{
+                      position: 'absolute',
+                      top: 'calc(100% + 10px)',
+                      right: 0,
+                      width: '320px',
+                      maxHeight: '380px',
+                      overflowY: 'auto',
+                      zIndex: 41,
+                      padding: '0.5rem 0',
+                    }}
+                  >
+                    <div
+                      style={{
+                        padding: '0.5rem 1rem 0.75rem',
+                        fontWeight: 700,
+                        fontSize: '0.9rem',
+                        borderBottom:
+                          '1px solid rgba(120,120,120,0.15)',
+                      }}
+                    >
+                      Friend Requests
+                    </div>
+
+                    {incomingRequests.length === 0 ? (
+                      <div className="p-6 text-center campus-secondary-text text-sm">
+                        No new requests.
+                      </div>
+                    ) : (
+                      incomingRequests.map((req) => (
+                        <div
+                          key={req._id}
+                          style={{
+                            padding: '0.75rem 1rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            gap: '0.5rem',
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.6rem',
+                              minWidth: 0,
+                            }}
+                          >
+                            <Avatar
+                              alt={req.from?.name}
+                              size="sm"
+                            />
+
+                            <div style={{ minWidth: 0 }}>
+                              <p className="text-sm font-medium truncate">
+                                {req.from?.name}
+                              </p>
+
+                              <p className="text-xs campus-secondary-text truncate">
+                                {req.from?.rollNo}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex gap-1">
+                            <button
+                              onClick={() =>
+                                onRespondToRequest?.(
+                                  req._id,
+                                  'accept'
+                                )
+                              }
+                              className="campus-plus-button"
+                              title="Accept"
+                            >
+                              <Check className="w-4 h-4" />
+                            </button>
+
+                            <button
+                              onClick={() =>
+                                onRespondToRequest?.(
+                                  req._id,
+                                  'reject'
+                                )
+                              }
+                              className="campus-plus-button"
+                              title="Decline"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
 
             <button
               onClick={() => setDarkMode(!darkMode)}
@@ -1309,35 +2230,178 @@ const DashboardView = ({
 // DIRECTORY
 // ============================================================
 
-const DirectoryView = ({ usersList }) => {
+const DirectoryView = ({ profile }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterBranch, setFilterBranch] =
-    useState('All');
+  const [filterBranch, setFilterBranch] = useState('All');
+  const [directoryUsers, setDirectoryUsers] = useState([]);
+  const [loadingUsers, setLoadingUsers] = useState(true);
+  const [busyUserId, setBusyUserId] = useState(null);
+  const [fetchError, setFetchError] = useState('');
 
-  const filteredUsers = usersList.filter((user) => {
-    const name =
-      user.name?.toLowerCase() || '';
+  const currentUserId = profile?._id || profile?.id;
 
-    const rollNo =
-      user.rollNo?.toLowerCase() || '';
+  const loadDirectory = async () => {
+    if (!currentUserId) return;
 
-    const search =
-      searchTerm.toLowerCase();
+    setLoadingUsers(true);
+    setFetchError('');
+
+    try {
+      const res = await fetch(
+        `${API_BASE_URL}/users/${currentUserId}`
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(
+          data.message || 'Failed to load directory.'
+        );
+      }
+
+      setDirectoryUsers(data);
+    } catch (err) {
+      setFetchError(
+        err?.message || 'Failed to load directory.'
+      );
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
+
+  useEffect(() => {
+    loadDirectory();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUserId]);
+
+  const handleSendRequest = async (toId) => {
+    setBusyUserId(toId);
+
+    try {
+      const res = await fetch(
+        `${API_BASE_URL}/requests/send`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fromId: currentUserId,
+            toId,
+          }),
+        }
+      );
+
+      if (res.ok) {
+        setDirectoryUsers((previous) =>
+          previous.map((u) =>
+            u._id === toId
+              ? { ...u, connectionStatus: 'pending_sent' }
+              : u
+          )
+        );
+      }
+    } finally {
+      setBusyUserId(null);
+    }
+  };
+
+  const handleCancelRequest = async (toId) => {
+    setBusyUserId(toId);
+
+    try {
+      const res = await fetch(
+        `${API_BASE_URL}/requests/cancel`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fromId: currentUserId,
+            toId,
+          }),
+        }
+      );
+
+      if (res.ok) {
+        setDirectoryUsers((previous) =>
+          previous.map((u) =>
+            u._id === toId
+              ? { ...u, connectionStatus: 'none' }
+              : u
+          )
+        );
+      }
+    } finally {
+      setBusyUserId(null);
+    }
+  };
+
+  const filteredUsers = directoryUsers.filter((user) => {
+    const name = user.name?.toLowerCase() || '';
+    const rollNo = user.rollNo?.toLowerCase() || '';
+    const search = searchTerm.toLowerCase();
 
     const matchSearch =
-      name.includes(search) ||
-      rollNo.includes(search);
+      name.includes(search) || rollNo.includes(search);
 
     const matchBranch =
-      filterBranch === 'All' ||
-      user.branch === filterBranch;
+      filterBranch === 'All' || user.branch === filterBranch;
+
+    return matchSearch && matchBranch;
+  });
+
+  const renderActionButton = (user) => {
+    const isBusy = busyUserId === user._id;
+
+    if (user.connectionStatus === 'friends') {
+      return (
+        <Button
+          variant="secondary"
+          className="flex-1 gap-1"
+          disabled
+        >
+          <UserCheck className="w-4 h-4" />
+          Friends
+        </Button>
+      );
+    }
+
+    if (user.connectionStatus === 'pending_sent') {
+      return (
+        <Button
+          variant="danger"
+          className="flex-1 gap-1"
+          disabled={isBusy}
+          onClick={() => handleCancelRequest(user._id)}
+        >
+          <UserX className="w-4 h-4" />
+          {isBusy ? 'Cancelling...' : 'Cancel Request'}
+        </Button>
+      );
+    }
+
+    if (user.connectionStatus === 'pending_received') {
+      return (
+        <Button
+          variant="secondary"
+          className="flex-1 gap-1"
+          disabled
+        >
+          <Clock className="w-4 h-4" />
+          Check Notifications
+        </Button>
+      );
+    }
 
     return (
-      matchSearch &&
-      matchBranch &&
-      user.status === 'verified'
+      <Button
+        className="flex-1 gap-1"
+        disabled={isBusy}
+        onClick={() => handleSendRequest(user._id)}
+      >
+        <UserPlus className="w-4 h-4" />
+        {isBusy ? 'Sending...' : 'Send Request'}
+      </Button>
     );
-  });
+  };
 
   return (
     <div className="campus-section">
@@ -1361,18 +2425,14 @@ const DirectoryView = ({ usersList }) => {
               placeholder="Search by name or roll no..."
               className="campus-search-input"
               value={searchTerm}
-              onChange={(e) =>
-                setSearchTerm(e.target.value)
-              }
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
 
           <select
             className="campus-select"
             value={filterBranch}
-            onChange={(e) =>
-              setFilterBranch(e.target.value)
-            }
+            onChange={(e) => setFilterBranch(e.target.value)}
           >
             <option>All</option>
             <option>CSE</option>
@@ -1383,56 +2443,53 @@ const DirectoryView = ({ usersList }) => {
         </div>
       </div>
 
-      <div className="campus-grid">
-        {filteredUsers.map((user) => (
-          <Card
-            key={user.id}
-            className="campus-student-card"
-          >
-            <Avatar
-              src={user.avatar}
-              alt={user.name}
-              size="lg"
-              verified
-            />
+      {fetchError && (
+        <div className="campus-error-box">{fetchError}</div>
+      )}
 
-            <h3 className="font-semibold text-lg mt-3">
-              {user.name}
-            </h3>
+      {loadingUsers ? (
+        <div className="text-center py-12 campus-secondary-text">
+          Loading directory...
+        </div>
+      ) : (
+        <div className="campus-grid cc-stagger-grid">
+          {filteredUsers.map((user) => (
+            <Card
+              key={user._id}
+              className="campus-student-card cc-hover-lift"
+            >
+              <Avatar
+                src={user.avatar}
+                alt={user.name}
+                size="lg"
+                verified
+              />
 
-            <p className="text-sm campus-secondary-text font-mono mt-1">
-              {user.rollNo}
-            </p>
+              <h3 className="font-semibold text-lg mt-3">
+                {user.name}
+              </h3>
 
-            <div className="flex gap-2 mt-3">
-              <Badge variant="primary">
-                {user.branch}
-              </Badge>
+              <p className="text-sm campus-secondary-text font-mono mt-1">
+                {user.rollNo}
+              </p>
 
-              <Badge>{user.year}</Badge>
+              <div className="flex gap-2 mt-3">
+                <Badge variant="primary">{user.branch}</Badge>
+              </div>
+
+              <div className="mt-6 w-full flex gap-2">
+                {renderActionButton(user)}
+              </div>
+            </Card>
+          ))}
+
+          {filteredUsers.length === 0 && (
+            <div className="col-span-full text-center py-12 campus-secondary-text">
+              No verified students found.
             </div>
-
-            <div className="mt-6 w-full flex gap-2">
-              <Button
-                variant="secondary"
-                className="flex-1"
-              >
-                View
-              </Button>
-
-              <Button className="flex-1">
-                Connect
-              </Button>
-            </div>
-          </Card>
-        ))}
-
-        {filteredUsers.length === 0 && (
-          <div className="col-span-full text-center py-12 campus-secondary-text">
-            No verified students found.
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
@@ -1457,33 +2514,37 @@ const MarketplaceView = ({
     category: 'Books',
   });
 
-  const handleAdd = async (e) => {
+  const handleAdd = (e) => {
     e.preventDefault();
-    
-    // 1. Send the new item to the Node.js Backend
-    try {
-      const res = await fetch('http://campusconnect-backend-mr1u.onrender.com/api/marketplace', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...newItem,
-          price: Number(newItem.price),
-          sellerName: profile.name // Attaches the real logged-in user's name
-        })
-      });
 
-      if (!res.ok) throw new Error('Failed to post item');
-      
-      const savedItem = await res.json(); // The item returned from MongoDB with its official ID
-      
-      // 2. Update the screen with the new MongoDB item
-      setMarketItems([savedItem, ...items]);
-      setShowAdd(false);
-      setNewItem({ title: '', price: '', condition: 'Like New', description: '', category: 'Books' });
-      
-    } catch (error) {
-      alert("Error posting item: " + error.message);
-    }
+    const newDoc = {
+      id: crypto.randomUUID
+        ? crypto.randomUUID()
+        : Math.random().toString(),
+
+      ...newItem,
+
+      price: Number(newItem.price),
+
+      sellerName: profile.name,
+
+      createdAt: Date.now(),
+    };
+
+    setMarketItems((previous) => [
+      newDoc,
+      ...previous,
+    ]);
+
+    setShowAdd(false);
+
+    setNewItem({
+      title: '',
+      price: '',
+      condition: 'Like New',
+      description: '',
+      category: 'Books',
+    });
   };
 
   return (
@@ -2013,6 +3074,304 @@ const ProfileView = ({ profile }) => {
             </Button>
           </Card>
         </div>
+      </div>
+    </div>
+  );
+};
+
+// ============================================================
+// CHAT (friend requests + messaging with accepted connections)
+// ============================================================
+
+const ChatView = ({ profile, markFriendRead }) => {
+  const currentUserId = profile?._id || profile?.id;
+
+  const [friends, setFriends] = useState([]);
+  const [selectedFriend, setSelectedFriend] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [messageText, setMessageText] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+
+  const loadFriends = async () => {
+    if (!currentUserId) return;
+
+    try {
+      const friendRes = await fetch(
+        `${API_BASE_URL}/friends/${currentUserId}`
+      );
+
+      const friendData = await friendRes.json();
+
+      setFriends(
+        Array.isArray(friendData) ? friendData : []
+      );
+    } catch (err) {
+      // silent fail on background poll
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadFriends();
+
+    const interval = setInterval(loadFriends, 5000);
+
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUserId]);
+
+  const loadMessages = async (friendId) => {
+    if (!currentUserId || !friendId) return;
+
+    try {
+      const res = await fetch(
+        `${API_BASE_URL}/messages/${currentUserId}/${friendId}`
+      );
+
+      const data = await res.json();
+
+      if (res.ok) setMessages(data);
+
+      markFriendRead?.(friendId);
+    } catch (err) {
+      // silent fail on background poll
+    }
+  };
+
+  useEffect(() => {
+    if (!selectedFriend) return;
+
+    loadMessages(selectedFriend._id);
+
+    const interval = setInterval(
+      () => loadMessages(selectedFriend._id),
+      3000
+    );
+
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedFriend]);
+
+  const handleSelectFriend = (friend) => {
+    setSelectedFriend(friend);
+    markFriendRead?.(friend._id);
+  };
+
+  const handleSend = async (e) => {
+    e.preventDefault();
+
+    if (!messageText.trim() || !selectedFriend) return;
+
+    setSending(true);
+
+    try {
+      const res = await fetch(
+        `${API_BASE_URL}/messages/send`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fromId: currentUserId,
+            toId: selectedFriend._id,
+            text: messageText,
+          }),
+        }
+      );
+
+      if (res.ok) {
+        setMessageText('');
+        loadMessages(selectedFriend._id);
+      }
+    } finally {
+      setSending(false);
+    }
+  };
+
+  return (
+    <div className="campus-section">
+      <div className="campus-page-header">
+        <div>
+          <h1 className="campus-page-title">Messages</h1>
+
+          <p className="campus-secondary-text">
+            Chat with connections who accepted your request.
+          </p>
+        </div>
+      </div>
+
+      <div
+        className="grid grid-cols-1 md:grid-cols-3 gap-4"
+        style={{ minHeight: '520px' }}
+      >
+        <Card className="p-0 overflow-hidden md:col-span-1 flex flex-col">
+          <div
+            style={{
+              padding: '0.85rem 1rem',
+              fontWeight: 700,
+              fontSize: '0.9rem',
+              borderBottom:
+                '1px solid rgba(120,120,120,0.15)',
+            }}
+          >
+            Friends
+          </div>
+
+          <div className="flex-1 overflow-y-auto">
+            {loading && (
+              <div className="p-6 text-center campus-secondary-text text-sm">
+                Loading...
+              </div>
+            )}
+
+            {!loading &&
+              (friends.length === 0 ? (
+                <div className="p-6 text-center campus-secondary-text text-sm">
+                  No connections yet. Send a request from
+                  the Directory. Accepted requests show up
+                  here automatically.
+                </div>
+              ) : (
+                friends.map((friend) => (
+                  <button
+                    key={friend._id}
+                    onClick={() =>
+                      handleSelectFriend(friend)
+                    }
+                    className="w-full flex items-center gap-3 p-3 hover:opacity-80 text-left"
+                    style={{
+                      background:
+                        selectedFriend?._id === friend._id
+                          ? 'rgba(79,70,229,0.1)'
+                          : 'transparent',
+                    }}
+                  >
+                    <Avatar
+                      alt={friend.name}
+                      size="sm"
+                      verified
+                    />
+
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium truncate">
+                        {friend.name}
+                      </p>
+
+                      <p className="text-xs campus-secondary-text truncate">
+                        {friend.rollNo}
+                      </p>
+                    </div>
+                  </button>
+                ))
+              ))}
+          </div>
+        </Card>
+
+        <Card className="p-0 overflow-hidden md:col-span-2 flex flex-col">
+          {!selectedFriend ? (
+            <div className="flex-1 flex items-center justify-center campus-secondary-text text-sm p-6 text-center">
+              Select a connection to start chatting.
+            </div>
+          ) : (
+            <>
+              <div
+                className="flex items-center gap-3 p-4"
+                style={{
+                  borderBottom: '1px solid rgba(120,120,120,0.15)',
+                }}
+              >
+                <Avatar
+                  alt={selectedFriend.name}
+                  size="sm"
+                  verified
+                />
+
+                <div>
+                  <p className="font-medium">
+                    {selectedFriend.name}
+                  </p>
+
+                  <p className="text-xs campus-secondary-text">
+                    {selectedFriend.rollNo}
+                  </p>
+                </div>
+              </div>
+
+              <div
+                className="flex-1 overflow-y-auto p-4 space-y-3"
+                style={{ minHeight: '360px' }}
+              >
+                {messages.length === 0 ? (
+                  <p className="campus-secondary-text text-sm text-center mt-8">
+                    No messages yet. Say hi!
+                  </p>
+                ) : (
+                  messages.map((msg) => {
+                    const isMine =
+                      msg.from === currentUserId ||
+                      msg.from?._id === currentUserId;
+
+                    return (
+                      <div
+                        key={msg._id}
+                        style={{
+                          display: 'flex',
+                          justifyContent: isMine
+                            ? 'flex-end'
+                            : 'flex-start',
+                        }}
+                      >
+                        <div
+                          className="cc-pop-in"
+                          style={{
+                            maxWidth: '70%',
+                            padding: '0.5rem 0.85rem',
+                            borderRadius: '1rem',
+                            background: isMine
+                              ? 'var(--accent, #16836f)'
+                              : 'rgba(120,120,120,0.15)',
+                            color: isMine ? '#fff' : 'inherit',
+                          }}
+                        >
+                          <p className="text-sm">
+                            {msg.text}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+
+              <form
+                onSubmit={handleSend}
+                className="flex gap-2 p-3"
+                style={{
+                  borderTop: '1px solid rgba(120,120,120,0.15)',
+                }}
+              >
+                <input
+                  type="text"
+                  value={messageText}
+                  onChange={(e) =>
+                    setMessageText(e.target.value)
+                  }
+                  placeholder="Type a message..."
+                  className="campus-search-input flex-1"
+                />
+
+                <Button
+                  type="submit"
+                  disabled={sending}
+                  className="gap-1"
+                >
+                  <Send className="w-4 h-4" />
+                </Button>
+              </form>
+            </>
+          )}
+        </Card>
       </div>
     </div>
   );

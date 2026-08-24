@@ -472,7 +472,7 @@ code {
 
 .campus-button-primary {
   background: var(--accent);
-  color: #ffffff;
+  color: #f5f5f5;
 
   border: 1px solid var(--accent);
 
@@ -1713,7 +1713,7 @@ code {
       var(--accent-hover)
     );
 
-  color: #ffffff;
+  color: #f5f5f5f5f5;
 }
 
 .campus-welcome-title {
@@ -1875,7 +1875,7 @@ code {
 .campus-approve-button {
   background: var(--success) !important;
   border-color: var(--success) !important;
-  color: #ffffff !important;
+  color: #f5f5f5 !important;
 }
 
 .campus-approve-button:hover {
